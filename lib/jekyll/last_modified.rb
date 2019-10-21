@@ -1,8 +1,9 @@
 require 'rbconfig'
 
 module Jekyll
-  module GitMetadata
+  module LastModified
     class Generator < Jekyll::Generator
+      VERSION = '1.0.0'
 
       safe true
 
@@ -19,12 +20,17 @@ module Jekyll
               path = page.relative_path
             end
             page.data['git'] = data['pages_data'][path]
+            unless page.data['git'].nil?
+              page.data['last_modified_at'] = page.data['git']['last_commit']['commit_date']
+              if page.data['date'] == site.time
+                page.data['date'] = page.data['git']['first_commit']['commit_date']
+              end
+            end
           end
         end
       end
 
       def load_git_metadata(site)
-
         current_sha = %x{ git rev-parse HEAD }.strip
 
         cache_dir = site.source + '/.git-metadata'
