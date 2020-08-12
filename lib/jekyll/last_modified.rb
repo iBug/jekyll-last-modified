@@ -3,7 +3,7 @@ require 'rbconfig'
 module Jekyll
   module LastModified
     class Generator < Jekyll::Generator
-      VERSION = '1.0.0'
+      VERSION = '1.0.1'
 
       safe true
 
@@ -11,6 +11,7 @@ module Jekyll
         raise "Git is not installed" unless git_installed?
 
         Dir.chdir(site.source) do
+          base_path = site.config['collections_dir']
           data = load_git_metadata(site)
           site.config['git'] = data['site_data']
           jekyll_items(site).each do |page|
@@ -18,6 +19,7 @@ module Jekyll
               path = page.path
             else
               path = page.relative_path
+              path = File.join base_path, path if base_path
             end
             page.data['git'] = data['pages_data'][path]
             unless page.data['git'].nil?
@@ -41,12 +43,14 @@ module Jekyll
           return JSON.parse(IO.read(cache_file))
         end
 
+        base_path = site.config['collections_dir']
         pages_data = {}
         jekyll_items(site).each do |page|
           if page.is_a?(Jekyll::Page)
             path = page.path
           else
             path = page.relative_path
+            path = File.join base_path, path if base_path
           end
           pages_data[path] = page_data(path)
         end
