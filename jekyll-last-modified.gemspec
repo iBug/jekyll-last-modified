@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "jekyll-last-modified"
-  spec.version       = '1.0.1'
+  spec.version       = '1.0.2'
   spec.authors       = ["iBug"]
   spec.email         = ["i@ibugone.com"]
   spec.summary       = %q{Set page date from Git database}
