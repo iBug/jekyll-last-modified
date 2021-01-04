@@ -112,7 +112,8 @@ module Jekyll
 
       def commit(sha)
         result = %x{ git show --format=fuller --name-only #{sha} }
-        long_sha, author_name, author_email, author_date, commit_name, commit_email, commit_date, message, changed_files = result.scan(/commit (.*)\nAuthor:(.*)<(.*)>\nAuthorDate:(.*)\nCommit:(.*)<(.*)>\nCommitDate:(.*)\n\n((?:\s\s\s\s[^\r\n]*\n)*)\n(.*)/m).first.map(&:strip)
+        long_sha, author_name, author_email, author_date, commit_name, commit_email, commit_date, message, changed_files = result.scan(/commit (.*)\nAuthor:(.*)<(.*)>\nAuthorDate:(.*)\nCommit:(.*)<(.*)>\nCommitDate:(.*)\n\n((?:^\s{4}[^\r\n]*\n)*)\n(.*)/m).first.map(&:strip)
+        message.gsub! /^\s{4}/, ''
         {
           'short_sha' => sha,
           'long_sha' => long_sha,
@@ -122,7 +123,9 @@ module Jekyll
           'commit_name' => commit_name,
           'commit_email' => commit_email,
           'commit_date' => commit_date,
-          'message' => message.gsub(/    /, ''),
+          'subject' => message.lines.first.strip,
+          'body' => message.lines[2..]&.join,
+          'message' => message,
           'changed_files' => changed_files.split("\n")
         }
       end
